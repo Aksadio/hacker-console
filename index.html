@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ACCESS CONTROL — HACKER CONSOLE</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#020408;--panel:#071524;--border:#0d3a5e;--glow:#00d4ff;--glow2:#00ff9d;--warn:#ff4040;--text:#c8e6f5;--muted:#4a7a9b}
+html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Share Tech Mono',monospace}
+#grid-bg{position:fixed;inset:0;background-image:linear-gradient(rgba(0,212,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,.04) 1px,transparent 1px);background-size:50px 50px;animation:gridMove 20s linear infinite}
+@keyframes gridMove{from{background-position:0 0}to{background-position:50px 50px}}
+#scanline{position:fixed;inset:0;pointer-events:none;z-index:1;background:repeating-linear-gradient(to bottom,transparent 0,transparent 2px,rgba(0,0,0,.08) 2px,rgba(0,0,0,.08) 4px)}
+.particle{position:fixed;border-radius:50%;animation:pfly linear infinite;opacity:0}
+@keyframes pfly{0%{transform:translateY(100vh);opacity:0}10%{opacity:.5}90%{opacity:.15}100%{transform:translateY(-10vh);opacity:0}}
+.status-bar{position:fixed;top:0;left:0;right:0;height:28px;background:rgba(5,13,20,.95);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:20px;z-index:20}
+.sdot{width:6px;height:6px;border-radius:50%;animation:blink 1.5s ease-in-out infinite}
+.sdot.g{background:var(--glow2);box-shadow:0 0 6px var(--glow2)}.sdot.r{background:var(--warn);animation-delay:.7s}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.stxt{font-size:10px;color:var(--muted);letter-spacing:2px}
+.sclock{margin-left:auto;font-size:10px;color:var(--muted)}
+.cube-wrap{position:fixed;right:8%;top:50%;transform-style:preserve-3d;animation:floatCube 8s ease-in-out infinite}
+@keyframes floatCube{0%,100%{transform:translateY(-50%) rotateX(15deg) rotateY(0deg)}50%{transform:translateY(calc(-50% - 20px)) rotateX(20deg) rotateY(180deg)}}
+.cube{width:120px;height:120px;transform-style:preserve-3d;position:relative}
+.face{position:absolute;width:120px;height:120px;border:1px solid rgba(0,212,255,.4);background:rgba(0,30,60,.3);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--glow);letter-spacing:2px}
+.face.fr{transform:translateZ(60px)}.face.bk{transform:rotateY(180deg) translateZ(60px)}
+.face.lt{transform:rotateY(-90deg) translateZ(60px)}.face.rt{transform:rotateY(90deg) translateZ(60px)}
+.face.tp{transform:rotateX(90deg) translateZ(60px)}.face.bt{transform:rotateX(-90deg) translateZ(60px)}
+.brand{position:fixed;left:40px;bottom:40px;z-index:10}
+.brand p{font-size:10px;color:rgba(0,212,255,.3);letter-spacing:3px;text-transform:uppercase;line-height:1.8}
+#auth-screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding-top:28px;z-index:10}
+.panel{width:440px;background:var(--panel);border:1px solid var(--border);border-radius:3px;padding:40px;position:relative;box-shadow:0 0 0 1px rgba(0,212,255,.05),0 20px 60px rgba(0,0,0,.8),inset 0 1px 0 rgba(0,212,255,.1);animation:panelIn .8s cubic-bezier(.16,1,.3,1) both}
+@keyframes panelIn{from{transform:rotateX(-15deg) translateY(30px);opacity:0}to{transform:rotateX(0) translateY(0);opacity:1}}
+.panel::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--glow),transparent);animation:scanBar 3s ease-in-out infinite}
+@keyframes scanBar{0%,100%{opacity:.3}50%{opacity:1}}
+.corner{position:absolute;width:14px;height:14px}
+.corner.tl{top:8px;left:8px;border-top:1px solid var(--glow);border-left:1px solid var(--glow)}
+.corner.tr{top:8px;right:8px;border-top:1px solid var(--glow);border-right:1px solid var(--glow)}
+.corner.bl{bottom:8px;left:8px;border-bottom:1px solid var(--glow);border-left:1px solid var(--glow)}
+.corner.br{bottom:8px;right:8px;border-bottom:1px solid var(--glow);border-right:1px solid var(--glow)}
+.hdr{text-align:center;margin-bottom:28px}
+.badge{display:inline-block;padding:3px 12px;border:1px solid var(--glow);font-size:10px;letter-spacing:3px;color:var(--glow);text-transform:uppercase;margin-bottom:14px;animation:badgePulse 2s ease-in-out infinite}
+@keyframes badgePulse{0%,100%{box-shadow:0 0 5px rgba(0,212,255,.2)}50%{box-shadow:0 0 15px rgba(0,212,255,.6)}}
+.hdr h1{font-family:'Orbitron',monospace;font-size:28px;font-weight:900;color:#fff;letter-spacing:4px;text-shadow:0 0 20px rgba(0,212,255,.5)}
+.hdr p{font-size:11px;color:var(--muted);margin-top:6px;letter-spacing:2px}
+.tabs{display:flex;margin-bottom:26px;border-bottom:1px solid var(--border)}
+.tab{flex:1;padding:10px;text-align:center;cursor:pointer;font-family:'Orbitron',monospace;font-size:11px;font-weight:700;letter-spacing:2px;color:var(--muted);border:none;background:none;border-bottom:2px solid transparent;transition:all .2s;margin-bottom:-1px}
+.tab:hover{color:var(--text)}.tab.active{color:var(--glow);border-bottom-color:var(--glow)}
+.fg{margin-bottom:16px}
+.fl{font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;display:block}
+.fi{width:100%;padding:11px 14px;background:rgba(0,5,15,.8);border:1px solid var(--border);border-radius:2px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:13px;outline:none;transition:all .2s;caret-color:var(--glow)}
+.fi:focus{border-color:var(--glow);box-shadow:0 0 10px rgba(0,212,255,.2),inset 0 0 8px rgba(0,212,255,.04)}
+.fi::placeholder{color:rgba(74,122,155,.45)}
+#sw{margin-top:5px;display:none}
+.sbar{height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.sfill{height:100%;transition:all .3s;border-radius:2px}
+#slabel{font-size:10px;margin-top:3px;letter-spacing:1px}
+.btn{width:100%;padding:13px;margin-top:6px;background:transparent;border:1px solid var(--glow);border-radius:2px;color:var(--glow);font-family:'Orbitron',monospace;font-size:13px;font-weight:700;letter-spacing:4px;cursor:pointer;position:relative;overflow:hidden;transition:all .3s}
+.btn::before{content:'';position:absolute;inset:0;background:var(--glow);transform:scaleX(0);transform-origin:left;transition:transform .3s;z-index:0}
+.btn:hover::before{transform:scaleX(1)}.btn:hover{color:#000}.btn:active{transform:scale(.98)}
+.btn span{position:relative;z-index:1}
+#msg{font-size:12px;text-align:center;padding:9px;margin-top:10px;border-radius:2px;display:none;letter-spacing:1px}
+#msg.err{background:rgba(255,64,64,.1);border:1px solid rgba(255,64,64,.3);color:var(--warn)}
+#msg.ok{background:rgba(0,255,157,.1);border:1px solid rgba(0,255,157,.3);color:var(--glow2)}
+#ucnt{font-size:10px;color:var(--muted);text-align:center;margin-top:14px;letter-spacing:1px}
+/* Launch overlay */
+#launching{position:fixed;inset:0;background:var(--bg);z-index:200;display:none;flex-direction:column;align-items:center;justify-content:center;gap:24px}
+.ring{width:60px;height:60px;border:2px solid var(--border);border-top-color:var(--glow);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.lbar-wrap{width:300px;height:2px;background:var(--border);border-radius:2px;overflow:hidden}
+.lbar{height:100%;background:var(--glow);animation:lbarFill 1s ease forwards}
+@keyframes lbarFill{from{width:0}to{width:100%}}
+.ltxt{font-size:11px;color:var(--glow);letter-spacing:4px;animation:blink 1s ease-in-out infinite}
+</style>
+</head>
+<body>
+<div id="grid-bg"></div>
+<div id="scanline"></div>
+
+<div class="status-bar">
+  <div class="sdot g"></div><span class="stxt">SECURE CONNECTION ESTABLISHED</span>
+  <div class="sdot r"></div><span class="stxt">FIREWALL: ACTIVE</span>
+  <span class="sclock" id="clk"></span>
+</div>
+
+<div class="cube-wrap">
+  <div class="cube">
+    <div class="face fr">&gt;_</div><div class="face bk">SYS</div>
+    <div class="face lt">0xF</div><div class="face rt">CMD</div>
+    <div class="face tp">///</div><div class="face bt">|||</div>
+  </div>
+</div>
+<div class="brand"><p>HACKER CONSOLE v2.0</p><p>RESTRICTED ACCESS SYSTEM</p></div>
+
+<div id="auth-screen">
+  <div class="panel">
+    <div class="corner tl"></div><div class="corner tr"></div>
+    <div class="corner bl"></div><div class="corner br"></div>
+    <div class="hdr">
+      <div class="badge">SYSTEM ACCESS</div>
+      <h1>TERMINAL</h1>
+      <p>AUTHENTICATE TO PROCEED</p>
+    </div>
+    <div class="tabs">
+      <button class="tab active" id="tab-login">LOGIN</button>
+      <button class="tab" id="tab-signup">REGISTER</button>
+    </div>
+    <div id="form-login">
+      <div class="fg"><label class="fl">IDENTITY</label><input class="fi" type="text" id="l-user" placeholder="enter username" autocomplete="username"/></div>
+      <div class="fg"><label class="fl">ACCESS KEY</label><input class="fi" type="password" id="l-pass" placeholder="enter password" autocomplete="current-password"/></div>
+      <button class="btn" id="btn-login"><span>[ AUTHENTICATE ]</span></button>
+    </div>
+    <div id="form-signup" style="display:none">
+      <div class="fg"><label class="fl">USERNAME</label><input class="fi" type="text" id="s-user" placeholder="choose username"/></div>
+      <div class="fg"><label class="fl">EMAIL ADDRESS</label><input class="fi" type="email" id="s-email" placeholder="your@email.com"/></div>
+      <div class="fg">
+        <label class="fl">CREATE PASSWORD</label>
+        <input class="fi" type="password" id="s-pass" placeholder="min. 6 characters"/>
+        <div id="sw"><div class="sbar"><div class="sfill" id="sfill"></div></div><div id="slabel"></div></div>
+      </div>
+      <div class="fg"><label class="fl">CONFIRM PASSWORD</label><input class="fi" type="password" id="s-pass2" placeholder="repeat password"/></div>
+      <button class="btn" id="btn-signup"><span>[ REGISTER IDENTITY ]</span></button>
+    </div>
+    <div id="msg"></div>
+    <div id="ucnt"></div>
+  </div>
+</div>
+
+<div id="launching">
+  <div class="ring"></div>
+  <div class="lbar-wrap"><div class="lbar"></div></div>
+  <div class="ltxt">INITIALIZING CONSOLE...</div>
+</div>
+
+<script>
+(function(){
+  for(var i=0;i<20;i++){
+    var p=document.createElement('div');p.className='particle';
+    var sz=Math.random()*2+1;
+    p.style.cssText='width:'+sz+'px;height:'+sz+'px;left:'+Math.random()*100+'%;animation-duration:'+(Math.random()*14+8)+'s;animation-delay:'+(Math.random()*10)+'s;background:'+(Math.random()>.6?'#00ff9d':'#00d4ff');
+    document.body.appendChild(p);
+  }
+})();
+
+setInterval(function(){
+  var n=new Date();
+  document.getElementById('clk').textContent=n.toLocaleTimeString('en-US',{hour12:false})+' UTC';
+},1000);
+
+function getUsers(){try{return JSON.parse(localStorage.getItem('hc_users')||'{}')}catch(e){return{}}}
+function setUsers(u){localStorage.setItem('hc_users',JSON.stringify(u))}
+
+function showMsg(txt,type){
+  var m=document.getElementById('msg');
+  m.textContent=txt;m.className=type;m.style.display='block';
+  if(type==='ok')setTimeout(function(){m.style.display='none'},4000);
+}
+
+function updateCount(){
+  var c=Object.keys(getUsers()).length;
+  document.getElementById('ucnt').textContent=c>0?'[ '+c+' REGISTERED OPERATOR'+(c!==1?'S':'')+' ]':'[ NO OPERATORS REGISTERED YET ]';
+}
+
+document.getElementById('tab-login').addEventListener('click',function(){switchTab('login')});
+document.getElementById('tab-signup').addEventListener('click',function(){switchTab('signup')});
+
+function switchTab(t){
+  document.getElementById('form-login').style.display=t==='login'?'block':'none';
+  document.getElementById('form-signup').style.display=t==='signup'?'block':'none';
+  document.getElementById('tab-login').className='tab'+(t==='login'?' active':'');
+  document.getElementById('tab-signup').className='tab'+(t==='signup'?' active':'');
+  document.getElementById('msg').style.display='none';
+}
+
+document.getElementById('s-pass').addEventListener('input',function(){
+  var pw=this.value,sw=document.getElementById('sw'),sf=document.getElementById('sfill'),sl=document.getElementById('slabel');
+  if(!pw){sw.style.display='none';return;}
+  sw.style.display='block';
+  var sc=0;
+  if(pw.length>=6)sc++;if(pw.length>=10)sc++;
+  if(/[A-Z]/.test(pw))sc++;if(/[0-9]/.test(pw))sc++;if(/[^A-Za-z0-9]/.test(pw))sc++;
+  var lvs=[{p:20,c:'#ff4040',t:'WEAK'},{p:40,c:'#ff8c00',t:'FAIR'},{p:60,c:'#ffd700',t:'MODERATE'},{p:80,c:'#7fff00',t:'STRONG'},{p:100,c:'#00ff9d',t:'MAXIMUM'}];
+  var lv=lvs[Math.min(sc,4)];
+  sf.style.width=lv.p+'%';sf.style.background=lv.c;sl.textContent='STRENGTH: '+lv.t;sl.style.color=lv.c;
+});
+
+document.getElementById('btn-signup').addEventListener('click',doSignup);
+function doSignup(){
+  var u=document.getElementById('s-user').value.trim();
+  var e=document.getElementById('s-email').value.trim();
+  var p=document.getElementById('s-pass').value;
+  var p2=document.getElementById('s-pass2').value;
+  if(!u||!e||!p||!p2){showMsg('ALL FIELDS REQUIRED','err');return;}
+  if(u.length<3){showMsg('USERNAME MIN 3 CHARACTERS','err');return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)){showMsg('INVALID EMAIL FORMAT','err');return;}
+  if(p.length<6){showMsg('PASSWORD MIN 6 CHARACTERS','err');return;}
+  if(p!==p2){showMsg('PASSWORDS DO NOT MATCH','err');return;}
+  var users=getUsers();
+  if(users[u.toLowerCase()]){showMsg('USERNAME ALREADY REGISTERED','err');return;}
+  users[u.toLowerCase()]={email:e,pass:btoa(unescape(encodeURIComponent(p))),created:Date.now()};
+  setUsers(users);updateCount();
+  showMsg('IDENTITY REGISTERED — PROCEED TO LOGIN','ok');
+  setTimeout(function(){switchTab('login')},1500);
+}
+
+document.getElementById('btn-login').addEventListener('click',doLogin);
+function doLogin(){
+  var u=document.getElementById('l-user').value.trim();
+  var p=document.getElementById('l-pass').value;
+  if(!u||!p){showMsg('CREDENTIALS REQUIRED','err');return;}
+  var users=getUsers();
+  var rec=users[u.toLowerCase()];
+  try{
+    if(!rec||decodeURIComponent(escape(atob(rec.pass)))!==p){showMsg('ACCESS DENIED — INVALID CREDENTIALS','err');return;}
+  }catch(err){showMsg('ACCESS DENIED — INVALID CREDENTIALS','err');return;}
+  localStorage.setItem('hc_session',JSON.stringify({user:u,ts:Date.now()}));
+  showMsg('ACCESS GRANTED — INITIALIZING CONSOLE...','ok');
+  setTimeout(function(){
+    document.getElementById('launching').style.display='flex';
+    setTimeout(function(){
+      window.location.href='app.html';
+    },1200);
+  },800);
+}
+
+document.addEventListener('keydown',function(e){
+  if(e.key!=='Enter')return;
+  if(document.getElementById('form-login').style.display!=='none')doLogin();
+  else doSignup();
+});
+
+updateCount();
+// Auto-login if valid session exists
+(function(){
+  try{
+    var s=JSON.parse(localStorage.getItem('hc_session')||'null');
+    if(s&&(Date.now()-s.ts)<86400000){
+      var users=getUsers();
+      if(users[s.user.toLowerCase()]){
+        document.getElementById('launching').style.display='flex';
+        setTimeout(function(){window.location.href='app.html';},800);
+        return;
+      }
+    }
+  }catch(e){}
+})();
+</script>
+</body>
+</html>
