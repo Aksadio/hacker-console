@@ -24,8 +24,3 @@ A restricted-access hacker terminal with a 3D animated login dashboard.
 3. Login with your credentials
 4. Access the Hacker Console
 
-## 🛠️ Built With
-- HTML / CSS / JavaScript
-- 3D CSS transforms
-- LocalStorage for auth
-- Orbitron & Share Tech Mono fonts
