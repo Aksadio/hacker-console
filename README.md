@@ -3,14 +3,7 @@
 A restricted-access hacker terminal with a 3D animated login dashboard.
 
 ## 🔗 Live Demo
-👉 [https://Aksadio.github.io/hacker-console/](https://Aksadio.github.io/hacker-console/)
-
-## 🔐 Features
-- 3D animated login dashboard
-- User registration & login system
-- Password strength meter
-- 24-hour session persistence
-- Secure access to hacker console
+👉 [Here](https://Aksadio.github.io/hacker-console/)
 
 ## 📁 Files
 | File | Description |
